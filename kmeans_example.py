@@ -18,23 +18,35 @@ if not os.path.isfile(args.dataset):
 # Load the dataset from the provided CSV file
 data = pd.read_csv(args.dataset).values
 
+# Extract the dataset name without extension for file naming
+dataset_name = os.path.splitext(os.path.basename(args.dataset))[0]
+
 # K-means clustering
 kmeans = KMeans(n_clusters=args.n_clusters)
 kmeans.fit(data)
 
-# Print the labels assigned to each data point
-print("Labels assigned to each data point:")
-print(kmeans.labels_)
+# Save the clustering results to a .txt file
+with open(f"{dataset_name}_results.txt", "w") as file:
+    file.write("Labels assigned to each data point:\n")
+    file.write(f"{kmeans.labels_}\n\n")
+    
+    file.write("Coordinates of cluster centers:\n")
+    file.write(f"{kmeans.cluster_centers_}\n\n")
+    
+    file.write("Inertia (sum of squared distances to the closest cluster center):\n")
+    file.write(f"{kmeans.inertia_}\n")
 
-# Print the coordinates of the cluster centers
-print("\nCoordinates of cluster centers:")
-print(kmeans.cluster_centers_)
-
-# Print the inertia (sum of squared distances to the closest cluster center)
-print("\nInertia (sum of squared distances to the closest cluster center):")
-print(kmeans.inertia_)
+print(f"Clustering results saved to {dataset_name}_results.txt")
 
 # Plotting the results
 plt.scatter(data[:, 0], data[:, 1], c=kmeans.labels_, cmap='rainbow')
 plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='black', marker='x')
+plt.title(f"K-means Clustering ({dataset_name})")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+
+# Save the figure as a .png file with the dataset name
+plt.savefig(f"{dataset_name}_clusters.png")
 plt.show()
+
+print(f"Clustering plot saved to {dataset_name}_clusters.png")
